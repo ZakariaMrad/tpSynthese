@@ -1,0 +1,38 @@
+<div class="container">
+   <section  id="entete" class="row border border-warning border-5">
+      
+      <article *ngIf="devConnecte.Id==0" class="col-6">
+         <h1>
+           <img width=50 heigth=50 src='assets/images/jourvie.png'> Jourvie</h1>
+      </article>
+
+      <article *ngIf="devConnecte.Id>0" class="col-6">
+         <h1>
+           <img width=50 heigth=50 src='assets/images/jourvie.png'>Jourvie {{devConnecte.Prenom}} 
+           {{ devConnecte.Nom }}</h1>
+      </article>
+
+      <article *ngIf="devConnecte.Id>0" class="col-6">
+         <h1>Projet :{{devConnecte.NomProjet }}</h1>
+      </article>
+
+
+   </section>
+
+   <app-connexion *ngIf="!logonOK"
+      (connexionReussie)="onConnexionReussie($event)"
+      (connexionReussie)="tac.onConnexionReussie($event)">
+   </app-connexion>
+
+   <app-taches #tac
+      (demarrerSessionTravail)="jour.onDemarrerSessTrav($event)"
+      (connexionDevActif)="jour.onConnexionDevActif($event)">
+   </app-taches>
+
+   <app-journal #jour
+       [dev] = "devConnecte"
+       (changementTache) = "tac.onChangementTache($event)" >
+   </app-journal>
+
+
+</div>

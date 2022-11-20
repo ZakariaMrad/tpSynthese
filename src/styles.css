@@ -1,0 +1,23 @@
+#entete{
+    background-color: black;
+    color:rgb(248,99,6)
+}
+
+.btnMenu{
+    width:40px;
+    height:40px;
+}
+
+.actif{
+    background-color: green;
+    color: white;
+}
+
+.inactif{
+    background-color: yellow;
+    color: red;
+}
+
+.beige{
+    background-color: beige;
+}
