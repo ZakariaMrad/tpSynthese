@@ -1,32 +1,36 @@
 <div *ngIf="visible">
-   <section class="row {{dev.Etat}}">
-     <article class="col-5">
-       <h2>Choisissez votre prochaine tâche:</h2>
-      </article>
+  <section class="row {{dev.Etat}}">
+    <article class="col-5">
+      <h2>Choisissez votre prochaine tâche:</h2>
+    </article>
 
-      <article class="col-7">
-        <button (click)="ouvrirStatistiques()" data-toggle="tooltip"  title="Consulter les statistiques">
-          <img class='btnMenu' src="assets/images/stats.png">
-        </button>
-        <button  (click)="ouvrirJournal()" data-toggle="tooltip"  title="Ouvrir le journal du développeur">
-          <img class='btnMenu' src="assets/images/Journal.png">
-        </button>
-      </article>
-</section>
+    <article class="col-7">
+      <button (click)="ouvrirStatistiques()" data-toggle="tooltip" title="Consulter les statistiques">
+        <img class='btnMenu' src="assets/images/stats.png">
+      </button>
+      <button (click)="ouvrirJournal()" data-toggle="tooltip" title="Ouvrir le journal du développeur">
+        <img class='btnMenu' src="assets/images/Journal.png">
+      </button>
+    </article>
+  </section>
 
-<table class="table table-striped" style="border">
+  <table class="table table-striped">
     <thead>
-    <tr>
-        <th>Numéro</th><th>Titre</th><th>Descr</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let tac of ListeTaches">
-      <td class="badge rounded-pill bg-info" data-toggle="tooltip"  title="Démarrer une session de travail sur cette tâche"
-       (click)="demarrerSessTrav(tac)">{{tac.Numero}}</td><td>{{tac.Titre}}</td><td>{{tac.Description}}</td>
-    </tr>
-  </tbody>
+      <tr>
+        <th>Numéro</th>
+        <th>Titre</th>
+        <th>Descr</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let tac of ListeTaches">
+        <td class="badge rounded-pill bg-info" data-toggle="tooltip"
+          title="Démarrer une session de travail sur cette tâche" (click)="demarrerSessTrav(tac)">{{tac.Numero}}</td>
+        <td>{{tac.Titre}}</td>
+        <td>{{tac.Description}}</td>
+      </tr>
+    </tbody>
 
-</table>
+  </table>
 
 </div>

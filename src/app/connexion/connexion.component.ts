@@ -13,6 +13,7 @@ import { JvService } from '../jv.service';
 })
 export class ConnexionComponent implements OnInit {
   @Output() connexionReussie: EventEmitter<Developpeur> = new EventEmitter<Developpeur>();
+  @Output() connexionAdmin: EventEmitter<boolean> = new EventEmitter<boolean>();
   developpeurConnecte:Developpeur = new Developpeur();
   Matricule:string = "";
   MotDePasse:string="";
@@ -25,6 +26,13 @@ export class ConnexionComponent implements OnInit {
 
   verifierConnexion()
   {
+    if (this.Matricule=="admin" && this.MotDePasse == "11"){
+      this.connexionAdmin.emit(true);
+      return;
+    }
+
+
+
     if (this.Matricule.length == 0)
     {
       // Forcer une connexion triche
@@ -34,6 +42,7 @@ export class ConnexionComponent implements OnInit {
    
     this.jvSrv.getConnexion(this.Matricule, this.MotDePasse).subscribe( dev =>
      {
+      console.log(dev);
          let to = typeof(dev);
          //tr('typeof dev =' +  to);
          if (to === 'string')

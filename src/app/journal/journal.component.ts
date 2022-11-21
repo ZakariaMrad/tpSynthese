@@ -5,11 +5,13 @@
 //  Projet : Jourvie
 //------------------------------------------
 
-import { Component, Input, Output, EventEmitter,  OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { DatePipe } from '@angular/common';
+
 import { Developpeur } from '../modeles/Developpeur';
 import { SessionTravail } from '../modeles/SessionTravail';
-import { tr, getDateTimeISOString  } from '../outils';
-import { Tache} from './../modeles/Tache';
+import { tr, getDateTimeISOString } from '../outils';
+import { Tache } from './../modeles/Tache';
 import { Fait } from './../modeles/Fait';
 import { Commentaire } from '../modeles/Commentaire';
 import { JvService } from '../jv.service';
@@ -21,79 +23,98 @@ import { JvService } from '../jv.service';
 })
 export class JournalComponent implements OnInit {
   @Input()
-  dev:Developpeur = new Developpeur();
+  dev: Developpeur = new Developpeur();
 
   @Output()
-  changementTache:EventEmitter<Developpeur> = new EventEmitter<Developpeur>();
+  changementTache: EventEmitter<Developpeur> = new EventEmitter<Developpeur>();
 
-  visible=false;
-  commentaireVisible=false;
-  btnCommentaireVisible=false;
-  btnArreterSessionVisible=false;
-  btnChangerTacheVisible=true;
-  btnConsulterTachesVisible=false;
-  btnStatsVisible=true;
+  visible = false;
+  commentaireVisible = false;
+  btnCommentaireVisible = false;
+  btnArreterSessionVisible = false;
+  btnChangerTacheVisible = true;
+  btnConsulterTachesVisible = false;
+  btnStatsVisible = true;
 
-  tacheCourante:Tache = new Tache();
-  sessTravCourante:SessionTravail = new SessionTravail(); 
-  tabSessionsTravail:SessionTravail[] = Array();
+  timer = 0;
+
+  tacheCourante: Tache = new Tache();
+  sessTravCourante: SessionTravail = new SessionTravail();
+  tabSessionsTravail: SessionTravail[] = Array();
 
   tabFaits: Fait[] = new Array();
 
-  commentaireCourant:Commentaire = new Commentaire();
+  commentaireCourant: Commentaire = new Commentaire();
   tabComment: Commentaire[] = new Array();
-  constructor(private jvSrv:JvService) { }
+  constructor(private jvSrv: JvService,) { }
 
   //---------------------------------
   //
   //---------------------------------
   ngOnInit(): void {
+    this.startTimer();
+  }
+
+  //---------------------------------
+  //Part le timer
+  //---------------------------------
+  startTimer() {
+    setInterval(() => {
+      this.timer += 2;
+    }, 2000)
+  }
+
+  //---------------------------------
+  // Affichage bizarre du temps
+  //---------------------------------
+  AffichageBizarreTemps() {
+    if (this.timer < 180) return this.timer.toFixed(1) + " secondes";
+    if (this.timer / 60 < 180) return (this.timer / 60).toFixed(1) + " minutes";
+    return (this.timer / 3600).toFixed(1) + " heures"
+
   }
 
   //---------------------------------
   //
   //---------------------------------
-  onDemarrerSessTrav(tac:Tache)
-  {
-   // tr("dev= " + this.dev.Prenom + " actif sur  " + tac.Titre);
+  onDemarrerSessTrav(tac: Tache) {
+    this.timer = 0;
+    // tr("dev= " + this.dev.Prenom + " actif sur  " + tac.Titre);
     this.tacheCourante = tac;
-    this.dev.Etat='actif';
+    this.dev.Etat = 'actif';
     //let dd = getDateTimeISOString();
 
- 
-     this.jvSrv.postSessionTravail(tac, this.dev).subscribe
-     (
-      idSessTrav => 
-      {
-        //tr("id sess trav: " + idSessTrav);
+
+    this.jvSrv.postSessionTravail(tac, this.dev).subscribe
+      (
+        idSessTrav => {
+          //tr("id sess trav: " + idSessTrav);
 
           this.jvSrv.getSessionsTravail(this.dev.Id).subscribe
-          (
-            tabSessTrav => 
-            {
-              this.tabSessionsTravail = tabSessTrav;
-             
-              let indice = this.tabSessionsTravail.length -1;
-              this.sessTravCourante = this.tabSessionsTravail[indice];
-              this.btnArreterSessionVisible = true;
+            (
+              tabSessTrav => {
+                this.tabSessionsTravail = tabSessTrav;
 
-              this.jvSrv.getCommentaires(this.dev.Id).subscribe
-              (
-                tabComms =>
-                {
-                  this.tabComment = tabComms;
-                  this.rafraichirJournal();
-                  this.btnCommentaireVisible = true;
-                  this.btnStatsVisible = true;
-                }
-              ) 
-            }
-         )
-       }
-     );
-  
+                let indice = this.tabSessionsTravail.length - 1;
+                this.sessTravCourante = this.tabSessionsTravail[indice];
+                this.btnArreterSessionVisible = true;
 
-    this.visible=true;
+                this.jvSrv.getCommentaires(this.dev.Id).subscribe
+                  (
+                    tabComms => {
+                      this.tabComment = tabComms;
+                      this.rafraichirJournal();
+                      this.btnCommentaireVisible = true;
+                      this.btnStatsVisible = true;
+                    }
+                  )
+              }
+            )
+        }
+      );
+
+
+    this.visible = true;
     this.btnCommentaireVisible = true;
 
   }
@@ -101,22 +122,21 @@ export class JournalComponent implements OnInit {
   //---------------------------------
   //
   //---------------------------------
-  arreterSessTrav()
-  {
-     this.jvSrv.putSessionTravail(this.sessTravCourante.Id).subscribe(
-      sessTrav =>
-      {
+  arreterSessTrav() {
+    if (this.dev.Etat == "actif")
+      this.timer = 0;
+    this.jvSrv.putSessionTravail(this.sessTravCourante.Id).subscribe(
+      sessTrav => {
         this.sessTravCourante = sessTrav;
         this.jvSrv.getSessionsTravail(this.dev.Id).subscribe(
-          tabSesTrav =>
-          {
+          tabSesTrav => {
             this.tabSessionsTravail = tabSesTrav;
             this.rafraichirJournal();
             this.btnCommentaireVisible = false;
             this.btnArreterSessionVisible = false;
             this.dev.Etat = "inactif";
           })
-       
+
       }
     )
   }
@@ -124,24 +144,28 @@ export class JournalComponent implements OnInit {
   //---------------------------------
   //  
   //---------------------------------
-  onConnexionDevActif(dev:Developpeur)
-  {
+  onConnexionDevActif(dev: Developpeur) {
     this.visible = true;
     this.dev = dev;
     this.jvSrv.getSessionsTravail(this.dev.Id).subscribe(
       tabSessTrav => {
-         this.tabSessionsTravail = tabSessTrav;
-         let indice = this.tabSessionsTravail.length - 1;
-         this.sessTravCourante = tabSessTrav[indice];
-         this.btnArreterSessionVisible = true;
-         
-         this.jvSrv.getCommentaires(this.dev.Id).subscribe(
-          tabComms =>
-          {
+        this.tabSessionsTravail = tabSessTrav;
+        let indice = this.tabSessionsTravail.length - 1;
+        this.sessTravCourante = tabSessTrav[indice];
+        this.btnArreterSessionVisible = true;
+
+        this.jvSrv.getCommentaires(this.dev.Id).subscribe(
+          tabComms => {
             this.tabComment = tabComms;
             this.rafraichirJournal();
-            this.btnCommentaireVisible = true;
-            this.btnStatsVisible = true;
+            if (this.dev.Etat == "actif") {
+              this.btnCommentaireVisible = true;
+              this.btnStatsVisible = true;
+            } else {
+              this.btnCommentaireVisible = false;
+              this.btnArreterSessionVisible = false;
+            }
+
           }
         )
       }
@@ -153,46 +177,41 @@ export class JournalComponent implements OnInit {
   //---------------------------------
   //
   //---------------------------------
-  commenter()
-  {
+  commenter() {
     // Activer le formulaire de saisie
     this.commentaireVisible = true;
     this.btnCommentaireVisible = false;
-    this.btnChangerTacheVisible =false;
-    this.btnStatsVisible =false;
-    this.btnConsulterTachesVisible=false;
-    this.btnArreterSessionVisible=false;
+    this.btnChangerTacheVisible = false;
+    this.btnStatsVisible = false;
+    this.btnConsulterTachesVisible = false;
+    this.btnArreterSessionVisible = false;
   }
 
   //---------------------------------
   //
   //---------------------------------
-  changerTache()
-  {
+  changerTache() {
     //tr("chager tac");
-    if (this.sessTravCourante.Fin === null)
-    {
+    if (this.sessTravCourante.Fin === null) {
       this.arreterSessTrav();
     }
     this.visible = false;
     this.changementTache.emit(this.dev);
 
   }
-  
+
 
   //---------------------------------
   //
   //---------------------------------
-  tacheReadOnly()
-  {
+  tacheReadOnly() {
     tr("consul tac");
   }
 
   //---------------------------------
   //
   //---------------------------------
-  statistiques()
-  {
+  statistiques() {
     tr("consulter stat");
   }
 
@@ -200,23 +219,21 @@ export class JournalComponent implements OnInit {
   //---------------------------------
   //
   //---------------------------------
-  rafraichirJournal()
-  {
-    this.tabFaits = Array(); 
+  rafraichirJournal() {
+    this.tabFaits = Array();
     this.rafraichirFaitsDeSessions();
     this.rafraichirFaitsCommentaires();
 
     this.tabFaits.sort(this.compareDate);
     this.enleverDatesRedondantes();
   }
-  
-  
+
+
   //---------------------------------
   //
   //---------------------------------
-  rafraichirFaitsCommentaires()
-  {
-    this.tabComment.forEach( (com,i) => {
+  rafraichirFaitsCommentaires() {
+    this.tabComment.forEach((com, i) => {
       tr(com.Contenu + " " + com.Horodateur, 0);
       this.tabFaits.push(new Fait(i, this.sessTravCourante, false, com))
     });
@@ -225,16 +242,14 @@ export class JournalComponent implements OnInit {
   //---------------------------------
   //
   //---------------------------------
-  rafraichirFaitsDeSessions()
-  {
-    let compteur=0;
-    
+  rafraichirFaitsDeSessions() {
+    let compteur = 0;
+
     this.tabSessionsTravail.forEach(sessTrav => {
-        this.tabFaits.push(new Fait(++compteur, sessTrav))
-        if (sessTrav.Fin !== null)
-        {
-          this.tabFaits.push(new Fait(++compteur, sessTrav, false))
-        }
+      this.tabFaits.push(new Fait(++compteur, sessTrav))
+      if (sessTrav.Fin !== null) {
+        this.tabFaits.push(new Fait(++compteur, sessTrav, false))
+      }
     })
 
 
@@ -243,79 +258,68 @@ export class JournalComponent implements OnInit {
   //---------------------------------
   //
   //---------------------------------
-  enleverDatesRedondantes()
-  {
-     let dateUnique = this.tabFaits[0].Date;
-     for(let i=1; i< this.tabFaits.length; i++)
-     {
-       if(this.tabFaits[i].Date === dateUnique)
-       {
-          this.tabFaits[i].Date = '';
-       }
-       else
-       {
-           dateUnique = this.tabFaits[i].Date;   
-       }
-     }
-  }
-  
-  //---------------------------------
-  //
-  //---------------------------------
-  compareDate(f1:Fait, f2:Fait)
-  {
-    if (f1.Date > f2.Date)
-      return -1;
-    if (f1.Date < f2.Date)  
-      return  1
-    if (f1.Date === f2.Date)      
-    {
-        if (f1.Heure > f2.Heure)
-           return -1;
-        if (f1.Heure < f2.Heure)   
-           return 1;
-    }   
-    return 0;
-  }
-   
-  //---------------------------------
-  //
-  //---------------------------------
-  annulerCommentaire()
-  {
-    this.commentaireVisible=false;
-    this.btnCommentaireVisible = true;
-    this.btnChangerTacheVisible =true;
-    this.btnStatsVisible =true;
-    this.btnConsulterTachesVisible=true;
-    this.btnArreterSessionVisible=true;
+  enleverDatesRedondantes() {
+    let dateUnique = this.tabFaits[0].Date;
+    for (let i = 1; i < this.tabFaits.length; i++) {
+      if (this.tabFaits[i].Date === dateUnique) {
+        this.tabFaits[i].Date = '';
+      }
+      else {
+        dateUnique = this.tabFaits[i].Date;
+      }
+    }
   }
 
   //---------------------------------
   //
   //---------------------------------
-  enregistrerCommentaire()
-  {
-      if (this.commentaireCourant.Contenu.length > 0)
-      {
+  compareDate(f1: Fait, f2: Fait) {
+    if (f1.Date > f2.Date)
+      return -1;
+    if (f1.Date < f2.Date)
+      return 1
+    if (f1.Date === f2.Date) {
+      if (f1.Heure > f2.Heure)
+        return -1;
+      if (f1.Heure < f2.Heure)
+        return 1;
+    }
+    return 0;
+  }
+
+  //---------------------------------
+  //
+  //---------------------------------
+  annulerCommentaire() {
+    this.commentaireVisible = false;
+    this.btnCommentaireVisible = true;
+    this.btnChangerTacheVisible = true;
+    this.btnStatsVisible = true;
+    this.btnConsulterTachesVisible = true;
+    this.btnArreterSessionVisible = true;
+  }
+
+  //---------------------------------
+  //
+  //---------------------------------
+  enregistrerCommentaire() {
+    if (this.commentaireCourant.Contenu.length > 0) {
 
       this.commentaireCourant.IdSession = this.sessTravCourante.Id;
       this.commentaireCourant.IdDev = this.dev.Id;
 
       this.jvSrv.postCommentaire(this.commentaireCourant).subscribe(
-      idComm =>
-      {
-        
-        this.jvSrv.getCommentaires(this.dev.Id).subscribe(
-          tabComms =>
-          {
-            this.tabComment = tabComms;
-            this.rafraichirJournal();
-            this.commentaireCourant = new Commentaire();
-          }
-        )
-      }
-     )
+        idComm => {
+
+          this.jvSrv.getCommentaires(this.dev.Id).subscribe(
+            tabComms => {
+              this.tabComment = tabComms;
+              this.rafraichirJournal();
+              this.commentaireCourant = new Commentaire();
+            }
+          )
+        }
+      )
     }
     else
       tr("Votre commentaire est vide");

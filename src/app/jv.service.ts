@@ -5,6 +5,9 @@ import {Developpeur } from './modeles/Developpeur';
 import {Tache } from './modeles/Tache';
 import { SessionTravail } from './modeles/SessionTravail';
 import { Commentaire } from './modeles/Commentaire';
+import { SommaireDev } from './modeles/SommaireDev';
+import { SommaireSessTrav } from './modeles/SommaireSessTrav';
+import { SommaireSessTravDev } from './modeles/SommaireSessTravDev';
 
 
 @Injectable({
@@ -13,6 +16,25 @@ import { Commentaire } from './modeles/Commentaire';
 export class JvService {
 
   constructor(private http:HttpClient) { }
+
+  getDev(idDev:number){
+    let url = serveur+"getDeveloppeur.php?matricule="+idDev;
+    return this.http.get<Developpeur>(url);
+  }
+
+  getSommairesSessTravDev(idDev:number){
+    let url = serveur+'getSommaireSessTrav.php?idDev='+idDev;
+    return this.http.get<SommaireSessTravDev[]>(url);
+  }
+  getSommairesSess(){
+    let url = serveur+'getSessionsTravEnCours.php';
+    return this.http.get<SommaireSessTrav[]>(url);
+  }
+
+  getSommairesDev(){
+    let url = serveur+'getSommaireDev.php';
+    return this.http.get<SommaireDev[]>(url);
+  }
 
   getCommentaires(idDev:number)
   {

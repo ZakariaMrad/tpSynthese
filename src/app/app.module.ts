@@ -7,13 +7,15 @@ import { AppComponent } from './app.component';
 import { ConnexionComponent } from './connexion/connexion.component';
 import { TachesComponent } from './taches/taches.component';
 import { JournalComponent } from './journal/journal.component';
+import { AdminComponent } from './admin/admin.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ConnexionComponent,
     TachesComponent,
-    JournalComponent
+    JournalComponent,
+    AdminComponent
   ],
   imports: [
     BrowserModule,

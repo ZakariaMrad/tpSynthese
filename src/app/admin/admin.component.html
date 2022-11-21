@@ -1,0 +1,91 @@
+<div *ngIf="visible" class="container">
+    <section class="row">
+        <article class="col-7">
+            <button *ngIf="sommairesVisible==1 || sommairesVisible==3" (click)="toggle(0)">
+                Sommaires des développeurs
+            </button>
+            <button *ngIf="sommairesVisible==0 || sommairesVisible==3" (click)="toggle(1)">
+                Sessions en cours
+            </button>
+        </article>
+    </section>
+    <section class="row">
+        <h2 *ngIf="sommairesVisible==0">Sommaires des développeurs</h2>
+        <h2 *ngIf="sommairesVisible==1">Sessions en cours</h2>
+        <h2 *ngIf="sommairesVisible==2">Détails des Sessions de travail de {{devCurr.Prenom}} {{devCurr.Nom}}</h2>
+    </section>
+    <section class="row">
+
+        <!-- Sommaires Dev -->
+        <table *ngIf="sommairesVisible==0" class="table">
+            <thead>
+                <tr>
+                    <td>Mat+Nom</td>
+                    <td>Projet (Id)</td>
+                    <td>nbSessTrav</td>
+                    <td>Heures</td>
+                    <td>nbCom</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let som of sommairesDev">
+                    <td (click)="AfficherDetail(som.mat)">{{som.mat}}</td>
+                    <td>{{som.projet}}</td>
+                    <td>{{som.nbSessTrav}}</td>
+                    <td>{{(som.Heures/3600).toFixed(1)}}</td>
+                    <td>{{som.nbComm}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <!-- Sommaires Sesstrav -->
+        <table *ngIf="sommairesVisible==1" class="table">
+            <thead>
+                <tr>
+                    <td>Dev</td>
+                    <td>SessId</td>
+                    <td>Debut</td>
+                    <td>Minutes</td>
+                    <td>Heures</td>
+                    <td>Tache</td>
+                    <td>NbComm</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let som of sommairesSess">
+                    <td>{{som.Dev}}</td>
+                    <td>{{som.SessId}}</td>
+                    <td>{{som.Debut}}</td>
+                    <td>{{som.Minutes}}</td>
+                    <td>{{(som.Minutes/60).toFixed(1)}}</td>
+                    <td>{{som.Tache}}</td>
+                    <td>{{som.nbComm}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <!-- Détails d'un developpeur -->
+        <table *ngIf="sommairesVisible==2" class="table">
+            <thead>
+                <tr>
+                    <td>SessId</td>
+                    <td>Debut</td>
+                    <td>Fin</td>
+                    <td>Minutes</td>
+                    <td>Heures</td>
+                    <td>Tache</td>
+                    <td>NbComm</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let som of devCurrSommaire">
+                    <td>{{som.IdSess}}</td>
+                    <td>{{som.Debut}}</td>
+                    <td>{{som.Fin}}</td>
+                    <td>{{som.Minutes}}</td>
+                    <td>{{ (som.Minutes/60).toFixed(1)}}</td>
+                    <td>{{som.IdTache}}</td>
+                    <td>{{som.nbComm}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+</div>

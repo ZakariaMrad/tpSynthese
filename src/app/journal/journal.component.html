@@ -4,67 +4,81 @@
 //  Auteur:  Alain Martel
 //  Date :   2022-09-22
 //  Projet : Jourvie
+//  Modifier par: Zakaria Mrad
+//  Date : 2022-11-20
 //------------------------------------------
 =-->
 
 
 <div *ngIf="visible">
-    <section class="row {{dev.Etat}}">
-      <article *ngIf="dev.Etat=='actif'; then thenBlock else elseBlock"></article>
-        <ng-template #thenBlock><div class="col-5"><h2>Journal, actif sur {{tacheCourante.Numero}} depuis {{sessTravCourante.Debut}}</h2></div></ng-template>
-        <ng-template #elseBlock><div class="col-5"><h2>Journal, inactif depuis {{sessTravCourante.Fin}}</h2></div></ng-template>
-
- 
-       <article class="col-7">
-        <button *ngIf="btnCommentaireVisible" (click)="commenter()" data-toggle="tooltip"  title="Écrire un commentaire dans votre journal">
-            <img class='btnMenu' src="assets/images/commentaire.png">
-          </button>
-          <button *ngIf="btnChangerTacheVisible" (click)="changerTache()" data-toggle="tooltip"  title="Arreter la sess de trav actuelle et choisir une autre tâche">
-            <img class='btnMenu' src="assets/images/changerTache.png">
-          </button>
-          <button *ngIf="btnArreterSessionVisible" (click)="arreterSessTrav()" data-toggle="tooltip"  title="Arrêter votre session de travail">
-            <img class='btnMenu' src="assets/images/stop.png">
-          </button>
-          <button  *ngIf="btnConsulterTachesVisible" (click)="tacheReadOnly()" data-toggle="tooltip"  title="Consulter liste de tâches">
-            <img class='btnMenu' src="assets/images/taches_readonly.png">
-          </button>
-          <button  *ngIf="btnStatsVisible" (click)="statistiques()" data-toggle="tooltip"  title="Consulter les statistiques">
-            <img class='btnMenu' src="assets/images/stats.png">
-          </button>
-        </article>
-     </section>
-
-    <section *ngIf="commentaireVisible" class="row beige">
-       <h3>Rédigez votre commentaire</h3>
-       <form (ngSubmit)="enregistrerCommentaire()">
-         <label>Commentaire:</label>
-         <textarea name="txtarea" [(ngModel)]="commentaireCourant.Contenu"></textarea>
-         <button (click)="annulerCommentaire()">Annuler</button>
-         <button type="submit">Enregistrer</button>
-       </form>
-    </section>
-
-    <section class="row">{{commentaireCourant.Contenu}}</section>
+  <section class="row {{dev.Etat}}">
+    <article *ngIf="dev.Etat=='actif'; then thenBlock else elseBlock"></article>
+    <ng-template #thenBlock>
+      <div class="col-12">
+        <h2>Journal<span class="float-end">Actif sur "{{tacheCourante.Titre}}"<br> depuis {{ AffichageBizarreTemps() }}</span></h2>
+      </div>
+    </ng-template>
+    <ng-template #elseBlock>
+      <div class="col-12">
+        <h2>Journal<span class="float-end">Inactif sur "{{tacheCourante.Titre}}"<br> depuis {{ AffichageBizarreTemps() }}</span></h2>
+      </div>
+    </ng-template>
 
 
-     <section class="row border border-dark border-5">
-         <table class="table">
-            <tr>
-              <th>Date</th>
-              <th>Heure</th>
-              <th>Tache</th>
-              <th>Type</th>
-              <th>Contenu</th>
-            </tr>
-            <tr *ngFor="let fait of tabFaits">
-              <td>{{fait.Date}}</td>
-              <td>{{fait.Heure}}</td>
-              <td *ngIf="fait.Contenu.length == 0">{{fait.TacheNumero}}</td>
-              <td *ngIf="fait.Contenu.length != 0"></td>
-              <td><img src='assets/images/{{fait.Type}}.png' height="30"></td>
-              <td>{{fait.Contenu}}</td>
-            </tr>
+    <article class="col-7">
+      <button *ngIf="btnCommentaireVisible" (click)="commenter()" data-toggle="tooltip"
+        title="Écrire un commentaire dans votre journal">
+        <img class='btnMenu' src="assets/images/commentaire.png">
+      </button>
+      <button *ngIf="btnChangerTacheVisible" (click)="changerTache()" data-toggle="tooltip"
+        title="Arreter la sess de trav actuelle et choisir une autre tâche">
+        <img class='btnMenu' src="assets/images/changerTache.png">
+      </button>
+      <button *ngIf="btnArreterSessionVisible" (click)="arreterSessTrav()" data-toggle="tooltip"
+        title="Arrêter votre session de travail">
+        <img class='btnMenu' src="assets/images/stop.png">
+      </button>
+      <button *ngIf="btnConsulterTachesVisible" (click)="tacheReadOnly()" data-toggle="tooltip"
+        title="Consulter liste de tâches">
+        <img class='btnMenu' src="assets/images/taches_readonly.png">
+      </button>
+      <button *ngIf="btnStatsVisible" (click)="statistiques()" data-toggle="tooltip" title="Consulter les statistiques">
+        <img class='btnMenu' src="assets/images/stats.png">
+      </button>
+    </article>
+  </section>
 
-         </table>
-     </section>
- </div>
+  <section *ngIf="commentaireVisible" class="row beige">
+    <h3>Rédigez votre commentaire</h3>
+    <form (ngSubmit)="enregistrerCommentaire()">
+      <label>Commentaire:</label>
+      <textarea name="txtarea" [(ngModel)]="commentaireCourant.Contenu"></textarea>
+      <button (click)="annulerCommentaire()">Annuler</button>
+      <button type="submit">Enregistrer</button>
+    </form>
+  </section>
+
+  <section class="row">{{commentaireCourant.Contenu}}</section>
+
+
+  <section class="row border border-dark border-5">
+    <table class="table">
+      <tr>
+        <th>Date</th>
+        <th>Heure</th>
+        <th>Tache</th>
+        <th>Type</th>
+        <th>Contenu</th>
+      </tr>
+      <tr *ngFor="let fait of tabFaits">
+        <td>{{fait.Date}}</td>
+        <td>{{fait.Heure}}</td>
+        <td *ngIf="fait.Contenu.length == 0">{{fait.TacheNumero}}</td>
+        <td *ngIf="fait.Contenu.length != 0"></td>
+        <td><img src='assets/images/{{fait.Type}}.png' height="30"></td>
+        <td>{{fait.Contenu}}</td>
+      </tr>
+
+    </table>
+  </section>
+</div>

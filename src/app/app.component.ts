@@ -19,4 +19,7 @@ export class AppComponent {
     this.logonOK = true;
     this.devConnecte = dev;
   }
+  onConnexionAdmin(b:boolean){
+    this.logonOK = b;
+  }
 }
